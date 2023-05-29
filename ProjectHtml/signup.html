@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO sign up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"  integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="crossorigin="anonymous"/>
+    <link rel="shortcut icon" href="images/Graphicloads-100-Flat-2-Chat-2.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script>
+       var oPosition = null;
+       $(function () {
+            $('#btnSignUp').click(function(){
+                     var oUserInfo = {
+                    "userId": $('#txtUser').val()
+                };
+              sessionStorage.setItem('userInfo', JSON.stringify(oUserInfo));
+              window.location.replace("http://localhost:3000/chat");
+            });
+        });
+   </script>
+  </head>
+  <body>
+    <div id="divSignUp">
+      <h1>
+        <i class="fas fa-smile"></i> SIGN UP
+      </h1>
+      <div class="join_main">
+        
+          <label>Name:</label><br/>
+          <input type="text" id="txtUser" /><br/>
+
+          <input type="button" id="btnSignUp" value="Sign Up">
+      </div>
+    </div>
+      
+    </body>
+</html>

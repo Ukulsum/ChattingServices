@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <link rel="shortcut icon" href="images/Graphicloads-100-Flat-2-Chat-2.ico">
+    <link rel="stylesheet" href="css/style.css">
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script>
+        $(function (){
+            var strUserInfo = sessionStorage.getItem('userInfo');
+            var oUserInfo = JSON.parse(strUserInfo);
+            if(oUserInfo===null){
+              window.location.replace("http://localhost:3000");
+            }
+            $('#user').text(oUserInfo.userId);
+            var socket = io();
+            $('#formMessage').submit(function(e) {
+                e.preventDefault(); // prevents page reloading
+                if($('#m').val()===null || $('#m').val() === ''){
+                  alert('Type a word to send message');
+                }
+                else{
+                  var currentDateTime = new Date();
+                  var newDateTime = currentDateTime.toLocaleDateString() + ' ' + currentDateTime.toLocaleTimeString();
+                    var oMessage = {
+                        "userId": oUserInfo.userId,
+                        "message": $('#m').val(),
+                        "dateTime": newDateTime
+                    };
+                  socket.emit('chat message', oMessage );
+                  $('#m').val('');
+                  return false;
+                }
+            });
+           socket.on('chat message', function(msg){
+                var htmlElements ='<strong>'+ msg.userId+'</strong>: '+msg.message+'<br/><span style="color:#7f8680">'+msg.dateTime+'</span>';
+                $('#messages').append($('<li>').html(htmlElements));
+            });
+            //form Submit
+            $("#formFileUpload").submit(function(evt){	 
+              evt.preventDefault();
+              var formData = new FormData($(this)[0]);
+              var f =$('#fileInput').val();
+              if($('#fileInput').val()===''){
+                alert('Attach a file to upload');
+              }
+              else{
+                $.ajax({
+                  url: 'uploadfile',
+                  type: 'POST',
+                  data: formData,
+                  async: false,
+                  cache: false,
+                  contentType: false,
+                  enctype: 'multipart/form-data',
+                  processData: false,
+                  success: function (response) {
+                    var res = JSON.parse(response);
+                    var currentDateTime = new Date();
+                    var newDateTime = currentDateTime.toLocaleDateString() + ' ' + currentDateTime.toLocaleTimeString();
+                    var oMessage = { "userId":oUserInfo.userId, "message":'<a href="'+res.filePath+'" target="_blank">'+res.fileName+'</a>', "dateTime":newDateTime };
+                    socket.emit('chat message', oMessage );
+                    $('#fileInput').val('');
+                  }
+                });
+                return false;
+              }
+            });
+        });
+ </script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="container">
+        <div id="divUser">
+          <strong class="strong">Welcome To Chat Service </strong><span id="user"></span>
+          <span id="user"></span>  
+        </div>
+        <ul id="messages"></ul>
+        <div id="dropContainer">
+            Drop your file here
+        </div>
+        <form id="formFileUpload">
+          <input type="file" name="fileInput" id="fileInput" multiple>
+          <input id="submit" type="submit" value="Upload">
+        </form>
+        <form action="" id="formMessage">
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+      </div>
+    </div>
+    <script>
+          dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+          evt.preventDefault();
+        };
+    dropContainer.ondrop = function(evt) {
+         fileInput.files = evt.dataTransfer.files;
+         const dT = new DataTransfer();
+          dT.items.add(evt.dataTransfer.files[0]);
+          fileInput.files = dT.files;
+          evt.preventDefault();
+        };
+ </script>
+  </body>
+</html>
